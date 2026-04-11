@@ -1,0 +1,82 @@
+name: Flask CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build_stage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install OS Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip wget
+
+      - name: Install Java 17
+        run: |
+          wget https://corretto.aws/downloads/latest/amazon-corretto-17-x64-linux-jdk.deb
+          sudo dpkg -i amazon-corretto-17-x64-linux-jdk.deb
+          java -version
+
+      - name: Create deployment package
+        run: |
+          mkdir -p deploy_package
+          # Copy application files (adjust paths based on your Flask app structure)
+          cp -r app deploy_package/ 2>/dev/null || :
+          cp -r application deploy_package/ 2>/dev/null || :
+          cp -r templates deploy_package/ 2>/dev/null || :
+          cp -r static deploy_package/ 2>/dev/null || :
+          cp *.py deploy_package/ 2>/dev/null || :
+          cp requirements.txt deploy_package/
+          cp Procfile deploy_package/ 2>/dev/null || :
+          cp .env.example deploy_package/ 2>/dev/null || :
+          # Create the zip file
+          cd deploy_package && zip -r ../deploy.zip . && cd ..
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-package
+          path: deploy.zip
+          retention-days: 7
+
+  deployment_stage:
+    runs-on: ubuntu-latest
+    needs: build_stage
+  
+    steps:
+      - name: Download Deployment Package
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-package
+  
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
+          application_name: Cold-storage-eb-x23337818
+          environment_name: Cold-storage-eb-x23337818-env
+          region: us-east-1
+          version_label: flask-build-${{ github.run_number }}
+          deployment_package: deploy.zip
+          wait_for_deployment: false
+          
