@@ -1,0 +1,6 @@
+flask
+flask-cors
+boto3
+paho-mqtt
+APScheduler
+requests
