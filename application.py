@@ -14,7 +14,7 @@ API_URL = "https://pndjbnrup9.execute-api.us-east-1.amazonaws.com/default/lambda
 REFRESH_INTERVAL = 5  # seconds
 
 # SNS Configuration
-SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:145075166360:x23389401-sns-fog-edge'
+SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:842675896420:sns-x24275387'
 SNS_REGION = 'us-east-1'
 
 # Initialize SNS client
@@ -181,7 +181,7 @@ Record Count: {data_summary.get('total_records', 0)}
 
 Immediate action required. Check dashboard for details.
 
-Dashboard URL: http://localhost:5000
+Dashboard URL: http://localhost:5001
         """
         
         response = sns_client.publish(
@@ -362,7 +362,7 @@ if __name__ == "__main__":
     print("  State of Charge: <15%")
     print("  State of Health: <75%")
     print("=" * 60)
-    print("Dashboard URL: http://localhost:5000")
+    print("Dashboard URL: http://localhost:5001")
     print("=" * 60)
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)
