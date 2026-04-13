@@ -73,8 +73,8 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
-          application_name: Cold-storage-eb-x23337818
-          environment_name: Cold-storage-eb-x23337818-env
+          application_name: Eb-x24275387
+          environment_name: Eb-x24275387-env
           region: us-east-1
           version_label: flask-build-${{ github.run_number }}
           deployment_package: deploy.zip
